@@ -4,8 +4,7 @@ import { supabase } from "./SupabaseClient";
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
-  const [website, setWebsite] = useState(null);
-  const [avatar_url, setAvatarUrl] = useState(null);
+  const [email, setEmail] = useState(null);
 
   useEffect(() => {
     getProfile();
@@ -17,8 +16,8 @@ export default function Account({ session }) {
       const user = supabase.auth.user();
 
       let { data, error, status } = await supabase
-        .from("profiles")
-        .select(`username, website, avatar_url`)
+        .from("players")
+        .select(`username, email`)
         .eq("id", user.id)
         .single();
 
@@ -28,8 +27,7 @@ export default function Account({ session }) {
 
       if (data) {
         setUsername(data.username);
-        setWebsite(data.website);
-        setAvatarUrl(data.avatar_url);
+        setEmail(data.email);
       }
     } catch (error) {
       alert(error.message);
@@ -38,7 +36,7 @@ export default function Account({ session }) {
     }
   }
 
-  async function updateProfile({ username, website, avatar_url }) {
+  async function updateProfile({ username, email }) {
     try {
       setLoading(true);
       const user = supabase.auth.user();
@@ -46,12 +44,11 @@ export default function Account({ session }) {
       const updates = {
         id: user.id,
         username,
-        website,
-        avatar_url,
+        email,
         updated_at: new Date(),
       };
 
-      let { error } = await supabase.from("profiles").upsert(updates, {
+      let { error } = await supabase.from("players").upsert(updates, {
         returning: "minimal", // Don't return the value after inserting
       });
 
@@ -81,19 +78,19 @@ export default function Account({ session }) {
         />
       </div>
       <div>
-        <label htmlFor="website">Website</label>
+        <label htmlFor="email">Email</label>
         <input
-          id="website"
-          type="website"
-          value={website || ""}
-          onChange={(e) => setWebsite(e.target.value)}
+          id="email"
+          type="email"
+          value={email || ""}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
 
       <div>
         <button
           className="button block primary"
-          onClick={() => updateProfile({ username, website, avatar_url })}
+          onClick={() => updateProfile({ username, email })}
           disabled={loading}
         >
           {loading ? "Loading ..." : "Update"}
