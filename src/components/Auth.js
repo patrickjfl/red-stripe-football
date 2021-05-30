@@ -4,11 +4,15 @@ import { supabase } from "./SupabaseClient";
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
 
-  const handleLogin = async (email) => {
+  const handleLogin = async (username, email) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signIn({ email });
+      // const { error } = await supabase.auth.signIn({ email });
+      const { error } = await supabase
+        .from("players")
+        .insert([{ username, email }]);
       if (error) throw error;
       alert("Check your email for the login link!");
     } catch (error) {
@@ -35,10 +39,18 @@ export default function Auth() {
           />
         </div>
         <div>
+          <input
+            className="inputField"
+            placeholder="Your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div>
           <button
             onClick={(e) => {
               e.preventDefault();
-              handleLogin(email);
+              handleLogin(username, email);
             }}
             className={"button block"}
             disabled={loading}

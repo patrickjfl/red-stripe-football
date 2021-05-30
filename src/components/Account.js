@@ -6,6 +6,8 @@ export default function Account({ session }) {
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
 
+  console.log("this is email: ", email);
+
   useEffect(() => {
     getProfile();
   }, [session]);
